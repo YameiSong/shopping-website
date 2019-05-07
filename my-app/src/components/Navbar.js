@@ -1,22 +1,26 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../logo.svg'
+import { ButtonContainer } from './ButtonContainer'
+import { NavWrapper } from "./NavWrapper";
 
 
 export default class Navbar extends Component {
     render() {
         return (
-            <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-sm-5">
+            <NavWrapper className="navbar navbar-expand-lg px-sm-5">
                 <Link to="/">
                     <img src={logo} alt="store" className="navbar-brand" />
                 </Link>
-                <div className="navbar-nav align-items-center">
-                    <a className="nav-item nav-link active" href="#">Home <span className="sr-only">(current)</span></a>
-                    <a className="nav-item nav-link" href="#">Features</a>
-                    <a className="nav-item nav-link" href="#">Pricing</a>
-                    <a className="nav-item nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                <div className="navbar-nav ml-5">
+                    <Link className="nav-item nav-link" to="/">products</Link>
                 </div>
-            </nav>
+                <Link className="ml-auto" to="/cart">
+                    <ButtonContainer>
+                        <i class="fas fa-cart-plus"></i>my cart
+                    </ButtonContainer>
+                </Link>
+            </NavWrapper>
         )
     }
 }
