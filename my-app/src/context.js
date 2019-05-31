@@ -7,7 +7,10 @@ const ProductContext = React.createContext()
 export default class ProductProvider extends Component {
     state = {
         products: [], // Bad solution: using "products: storeProducts" is actually use object by reference. When we will change "products" later, the "storeProducts" in data.js will also be changed.
-        detailProduct: detailProduct // This is also a reference of object. But since we won't change "detailProduct", so we didn't need to destruct and copy the prop.
+        detailProduct: detailProduct, // This is also a reference of object. But since we won't change "detailProduct", so we didn't need to destruct and copy the prop.
+        cart: [],
+        modalProduct: detailProduct,
+        modalOpen: true
     }
     componentDidMount() {
         this.setProducts()
@@ -23,7 +26,7 @@ export default class ProductProvider extends Component {
         })
     }
     getItem = (id) => {
-        const product = this.state.products.find(item => item.id == id)
+        const product = this.state.products.find(item => item.id === id)
         return product
     }
     handleDetail = (id) => {
@@ -33,14 +36,46 @@ export default class ProductProvider extends Component {
         })
     }
     addToCart = (id) => {
-        console.log(`ID ${id} is added to cart`)
+        let tempProducts = [...this.state.products]
+        const index = tempProducts.indexOf(this.getItem(id)) // id is a property of a product, not index in the products array
+        const product = tempProducts[index] // tempProducts[index] is a object. product use this object by reference, meaning that all changes on product will be made to tempProducts[index] as well.
+        product.inCart = true
+        product.count = 1
+        const price = product.price
+        product.total = price // just make total = price
+        this.setState(
+            () => {
+                return {
+                    products: tempProducts,
+                    cart: [...this.state.cart, product]
+                }
+            },
+            () => console.log(this.state)
+
+        )
+    }
+    openModel = (id) => {
+        const product = this.getItem(id)
+        this.setState(() => {
+            return {
+                modalProduct: product,
+                modelOpen: true
+            }
+        })
+    }
+    closeModal = () => {
+        this.setState(() => {
+            return { modelOpen: false }
+        })
     }
     render() {
         return (
             <ProductContext.Provider value={{
                 ...this.state,
                 handleDetail: this.handleDetail,
-                addToCart: this.addToCart
+                addToCart: this.addToCart,
+                openModel: this.openModel,
+                closeModal: this.closeModal
             }}>
                 {/* the below code means showing the child component of <ProductContext />. Without it the page would be blank. */}
                 {this.props.children}
