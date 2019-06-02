@@ -22,7 +22,10 @@ export default class Product extends Component {
                 <button
                   className="cart-btn"
                   disabled={inCart ? true : false}
-                  onClick={() => console.log('added to the cart')}
+                  onClick={() => {
+                    value.addToCart(id)
+                    value.openModal(id)
+                  }}
                 >
                   {inCart ? (<p className='text-capitalize mb-0'>in cart</p>) : (<i className='fas fa-cart-plus' />)}
                 </button>

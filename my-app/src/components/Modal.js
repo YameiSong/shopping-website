@@ -20,8 +20,23 @@ export default class Modal extends Component {
                         return (
                             <ModalContainer>
                                 <div className="container">
-                                    <div id="modal" className="col-8 mx-auto col-md-6 col-lg-4 text-center text-capitalize">
-                                        <h5>item added to the cart</h5>
+                                    <div className="row">
+                                        <div id="modal" className="col-8 mx-auto col-md-6 col-lg-4 text-center text-capitalize p-5">
+                                            <h5>item added to the cart</h5>
+                                            <img src={img} alt="product" className="img-fluid" />
+                                            <h5>{title}</h5>
+                                            <h5 className="text-muted">price : $ {price}</h5>
+                                            <Link to="/">
+                                                <ButtonContainer onClick={() => closeModal()}>
+                                                    store
+                                            </ButtonContainer>
+                                            </Link>
+                                            <Link to="/cart">
+                                                <ButtonContainer cart onClick={() => closeModal()}>
+                                                    go to cart
+                                            </ButtonContainer>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </ModalContainer>

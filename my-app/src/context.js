@@ -10,7 +10,7 @@ export default class ProductProvider extends Component {
         detailProduct: detailProduct, // This is also a reference of object. But since we won't change "detailProduct", so we didn't need to destruct and copy the prop.
         cart: [],
         modalProduct: detailProduct,
-        modalOpen: true
+        modalOpen: false
     }
     componentDidMount() {
         this.setProducts()
@@ -54,18 +54,18 @@ export default class ProductProvider extends Component {
 
         )
     }
-    openModel = (id) => {
+    openModal = (id) => {
         const product = this.getItem(id)
         this.setState(() => {
             return {
                 modalProduct: product,
-                modelOpen: true
+                modalOpen: true
             }
         })
     }
     closeModal = () => {
         this.setState(() => {
-            return { modelOpen: false }
+            return { modalOpen: false }
         })
     }
     render() {
@@ -74,7 +74,7 @@ export default class ProductProvider extends Component {
                 ...this.state,
                 handleDetail: this.handleDetail,
                 addToCart: this.addToCart,
-                openModel: this.openModel,
+                openModal: this.openModal,
                 closeModal: this.closeModal
             }}>
                 {/* the below code means showing the child component of <ProductContext />. Without it the page would be blank. */}
