@@ -10,7 +10,10 @@ export default class ProductProvider extends Component {
         detailProduct: detailProduct, // This is also a reference of object. But since we won't change "detailProduct", so we didn't need to destruct and copy the prop.
         cart: [],
         modalProduct: detailProduct,
-        modalOpen: false
+        modalOpen: false,
+        cartSubTotal: 0,
+        cartTax: 0,
+        cartTotal: 0
     }
     componentDidMount() {
         this.setProducts()
@@ -68,6 +71,22 @@ export default class ProductProvider extends Component {
             return { modalOpen: false }
         })
     }
+    increment = (id) => {
+        console.log('this is a increment method');
+
+    }
+    decrement = (id) => {
+        console.log('this is a decrement method');
+
+    }
+    removeItem = (id) => {
+        console.log('item removed');
+
+    }
+    clearCart = () => {
+        console.log('cart cleared');
+
+    }
     render() {
         return (
             <ProductContext.Provider value={{
@@ -75,7 +94,11 @@ export default class ProductProvider extends Component {
                 handleDetail: this.handleDetail,
                 addToCart: this.addToCart,
                 openModal: this.openModal,
-                closeModal: this.closeModal
+                closeModal: this.closeModal,
+                increment: this.increment,
+                decrement: this.decrement,
+                removeItem: this.removeItem,
+                clearCart: this.clearCart
             }}>
                 {/* the below code means showing the child component of <ProductContext />. Without it the page would be blank. */}
                 {this.props.children}
