@@ -53,8 +53,7 @@ export default class ProductProvider extends Component {
                     cart: [...this.state.cart, product]
                 }
             },
-            () => console.log(this.state)
-
+            () => this.addTotals()
         )
     }
     openModal = (id) => {
@@ -86,6 +85,19 @@ export default class ProductProvider extends Component {
     clearCart = () => {
         console.log('cart cleared');
 
+    }
+    addTotals = () => {
+        const subTotal = this.state.cart.reduce((acc, curr) => acc + curr.total, 0)
+        const tempTax = subTotal * 0.1
+        const tax = tempTax.toFixed(2)
+        const total = subTotal + tax
+        this.setState(() => {
+            return {
+                cartSubTotal: subTotal,
+                cartTax: tax,
+                cartTotal: total
+            }
+        })
     }
     render() {
         return (
