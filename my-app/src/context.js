@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { storeProducts, detailProduct } from './data'
+import produce from 'immer'
 
 const ProductContext = React.createContext()
 
@@ -18,12 +19,18 @@ export default class ProductProvider extends Component {
     componentDidMount() {
         this.setProducts()
     }
-    setProducts = () => {
-        let tempProducts = []
-        storeProducts.forEach(item => {
-            const singleItem = { ...item }
-            tempProducts = [...tempProducts, singleItem]
-        })
+    setProducts = () => { // copy storeProducts to state.products
+        // let tempProducts = []
+        // storeProducts.forEach(item => {
+        //     const singleItem = { ...item }
+        //     tempProducts = [...tempProducts, singleItem]
+        // })
+        // this.setState(() => {
+        //     return { products: tempProducts }
+        // })
+
+        // -----------------new method-------------------------------
+        const tempProducts = produce(storeProducts, draft => { })
         this.setState(() => {
             return { products: tempProducts }
         })
@@ -39,20 +46,37 @@ export default class ProductProvider extends Component {
         })
     }
     addToCart = (id) => {
-        let tempProducts = [...this.state.products]
-        const index = tempProducts.indexOf(this.getItem(id)) // id is a property of a product, not index in the products array
-        const product = tempProducts[index] // tempProducts[index] is a object. product use this object by reference, meaning that all changes on product will be made to tempProducts[index] as well.
-        product.inCart = true
-        product.count = 1
-        const price = product.price
-        product.total = price // just make total = price
+        // let tempProducts = [...this.state.products]
+        // const index = tempProducts.indexOf(this.getItem(id)) // id is a property of a product, not index in the products array
+        // const product = tempProducts[index] // tempProducts[index] is a object. product use this object by reference, meaning that all changes on product will be made to tempProducts[index] as well.
+        // product.inCart = true
+        // product.count = 1
+        // const price = product.price
+        // product.total = price // total = price*count, count=1
+        // this.setState(
+        //     () => {
+        //         return {
+        //             products: tempProducts,
+        //             cart: [...this.state.cart, product]
+        //         }
+        //     },
+        //     () => this.addTotals()
+        // )
+
+        // -------------------------new method---------------------
+        const index = this.state.products.indexOf(this.getItem(id))
+        const newState = produce(this.state, draft => {
+            let product = draft.products[index]
+            product.inCart = true
+            product.count = 1
+            const price = product.price
+            product.total = price // total = price*count, count=1
+
+            draft.cart = [...draft.cart, product]
+        })
+
         this.setState(
-            () => {
-                return {
-                    products: tempProducts,
-                    cart: [...this.state.cart, product]
-                }
-            },
+            () => { return newState },
             () => this.addTotals()
         )
     }
@@ -71,25 +95,67 @@ export default class ProductProvider extends Component {
         })
     }
     increment = (id) => {
-        console.log('this is a increment method');
-
+        const selectedProduct = this.state.cart.find(item=>item.id===id)
+        const index = this.state.cart.indexOf(selectedProduct)
+        const newCart = produce(this.state.cart, draft => {
+            let product = draft[index]
+            product.count += 1
+            product.total = product.count * product.price
+        })
+        this.setState(
+            () => { return { cart: newCart } },
+            () => this.addTotals()
+        )
     }
     decrement = (id) => {
         console.log('this is a decrement method');
 
     }
     removeItem = (id) => {
-        console.log('item removed');
+        // let tempProducts = [...this.state.products]
+        // let tempCart = [...this.state.cart]
 
+        // tempCart = tempCart.filter(item => item.id !== id)
+
+        // const index = tempProducts.indexOf(this.getItem(id))
+        // let removedProduct = tempProducts[index] // object is copied by reference. So changes on removedProducts will be reflected to tempProducts
+        // removedProduct.inCart = false
+        // removedProduct.count = 0
+        // removedProduct.total = 0
+
+        // this.setState(() => {
+        //     return {
+        //         cart: [...tempCart],
+        //         products: [...tempProducts]
+        //     }
+        // }, () => this.addTotals())
+
+        // ----------------new method------------------------------------
+        const index = this.state.products.indexOf(this.getItem(id))
+        const newState = produce(this.state, draft => {
+            draft.cart = draft.cart.filter(item => item.id !== id)
+            let removedProduct = draft.products[index]
+            removedProduct.inCart = false
+            removedProduct.count = 0
+            removedProduct.total = 0
+        })
+        this.setState(
+            () => { return newState },
+            () => this.addTotals()
+        )
     }
     clearCart = () => {
-        console.log('cart cleared');
-
+        this.setState(() => {
+            return { cart: [] }
+        }, () => {
+            this.setProducts()
+            this.addTotals()
+        })
     }
     addTotals = () => {
         const subTotal = this.state.cart.reduce((acc, curr) => acc + curr.total, 0)
         const tempTax = subTotal * 0.1
-        const tax = tempTax.toFixed(2)
+        const tax = parseFloat(tempTax.toFixed(2))
         const total = subTotal + tax
         this.setState(() => {
             return {
